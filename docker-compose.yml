@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  # FastAPI backend service
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: travel-planner-api
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    networks:
+      - travel-network
+    restart: always
+
+  # Streamlit frontend service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: travel-planner-frontend
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    environment:
+      - API_URL=http://api:8000
+    networks:
+      - travel-network
+    restart: always
+
+networks:
+  travel-network:
+    driver: bridge
